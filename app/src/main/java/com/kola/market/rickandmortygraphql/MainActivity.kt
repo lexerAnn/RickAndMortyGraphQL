@@ -1,37 +1,64 @@
 package com.kola.market.rickandmortygraphql
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.kola.market.rickandmortygraphql.adapter.CharacterAdapter
 import com.kola.market.rickandmortygraphql.data.RichAndMortyResult
+import com.kola.market.rickandmortygraphql.databinding.ActivityMainBinding
 import com.kola.market.rickandmortygraphql.domain.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
+
+    private lateinit var characterAdapter: CharacterAdapter
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+
+        characterAdapter = CharacterAdapter(){
+
+        }
+
 
         homeViewModel.resultListCharacters.observe(this){
             when(it) {
                 is RichAndMortyResult.Success -> {
-                    toast(it.data.toString())
+                    it.data?.results?.let { it1 -> characterAdapter.submitList(it1) }
                 }
                 is RichAndMortyResult.Error -> {
-                    toast("error")
                 }
                 else -> {
-                    toast("nothing")
                 }
             }
         }
-        homeViewModel.getCharacters()
+        homeViewModel.resultCharacterDetails.observe(this){
+            when(it) {
+                is RichAndMortyResult.Success -> {
+                    println(it.data)
+                    toast(it.data.toString())
+                }
+                is RichAndMortyResult.Error -> {
+                }
+                else -> {
+                }
+            }
+        }
+
+//        homeViewModel.getCharacters(1)
+        homeViewModel.getCharacterDetails("1")
+
+        binding.rvCharacters.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.rvCharacters.adapter = characterAdapter
 
     }
 }

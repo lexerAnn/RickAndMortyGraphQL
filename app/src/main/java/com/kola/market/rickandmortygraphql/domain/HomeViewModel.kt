@@ -1,39 +1,41 @@
 package com.kola.market.rickandmortygraphql.domain
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kola.market.rickandmortygraphql.BaseViewModel
-import com.kola.market.rickandmortygraphql.GetCharactersQuery
 import com.kola.market.rickandmortygraphql.data.RichAndMortyResult
+import com.kola.market.rickandmortygraphql.datasource.models.CharacterDetailsModel
 import com.kola.market.rickandmortygraphql.datasource.models.CharactersModel
-import com.kola.market.rickandmortygraphql.usecases.CharacterUseCases
+import com.kola.market.rickandmortygraphql.di.UseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val characterUseCases: CharacterUseCases
+    private val useCases: UseCases
 ): ViewModel() {
 
     private val _resultListCharacters = MutableLiveData<RichAndMortyResult<CharactersModel?>>()
     val resultListCharacters: LiveData<RichAndMortyResult<CharactersModel?>> = _resultListCharacters
 
+    private val _resultCharacterDetails = MutableLiveData<RichAndMortyResult<CharacterDetailsModel?>>()
+    val resultCharacterDetails: LiveData<RichAndMortyResult<CharacterDetailsModel?>> = _resultCharacterDetails
 
-     fun getCharacters(){
+     fun getCharacters(page: Int) {
          viewModelScope.launch {
-                 characterUseCases(2).collect {
-                     Log.d("ViewModelData->>>", it.toString())
+                 useCases.characterUseCases(page).collect {
                      _resultListCharacters.postValue(it)
                  }
          }
+    }
+
+    fun getCharacterDetails(id: String){
+        viewModelScope.launch {
+            useCases.characterDetailsUseCases(id).collect{
+                _resultCharacterDetails.postValue(it)
+            }
+        }
     }
 }

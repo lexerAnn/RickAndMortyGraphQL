@@ -1,8 +1,7 @@
 package com.kola.market.rickandmortygraphql
 
-import android.os.Looper
 import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.network.okHttpClient
+import com.kola.market.rickandmortygraphql.datasource.LoggingApolloInterceptor
 import okhttp3.OkHttpClient
 
 class RickMortyApi {
@@ -12,9 +11,11 @@ class RickMortyApi {
 //        }
 
         val okHttpClient = OkHttpClient.Builder().build()
+
         return ApolloClient.Builder()
             .serverUrl("https://rickandmortyapi.com/graphql")
-            .okHttpClient(okHttpClient)
+//            .okHttpClient(okHttpClient)
+            .addInterceptor(LoggingApolloInterceptor())
             .build()
     }
 }

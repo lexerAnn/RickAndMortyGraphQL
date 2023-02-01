@@ -1,24 +1,27 @@
 package com.kola.market.rickandmortygraphql.di
 
 import com.kola.market.rickandmortygraphql.datasource.remote.RemoteRepository
+import com.kola.market.rickandmortygraphql.usecases.CharacterDetailsUseCases
 import com.kola.market.rickandmortygraphql.usecases.CharacterUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import dagger.hilt.components.SingletonComponent
 
 
 @Module
 @InstallIn(ViewModelComponent::class)
-class CharacterUseCase {
+object UseCaseModule {
     @ViewModelScoped
     @Provides
-    fun providesProfileUseCases(
+    fun providesUseCases(
         remoteRepository: RemoteRepository
-    ): CharacterUseCases {
-        return CharacterUseCases(remoteRepository)
+    ): UseCases {
+        return UseCases(
+            characterUseCases = CharacterUseCases(remoteRepository),
+            characterDetailsUseCases = CharacterDetailsUseCases(remoteRepository)
+        )
     }
 
 }
